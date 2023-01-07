@@ -1,0 +1,9 @@
+body {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  background-image: url("bgc-image.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+}
