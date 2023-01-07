@@ -1,46 +1,47 @@
 const User = require("../models/user");
+const bcrypt = require("bcrypt");
+exports.register = async (req, res, next) => {
+  const { name, email, password } = req.body;
+  // try {
+  //   bcrypt.hash(req.body.password, 10, async (err, hash) => {
+  //     await User.create({
+  //       name,
+  //       email,
+  //       password: hash,
+  //     });
 
-exports.register = (req, res, next) => {
-  console.log(req.body);
-  User.create({
-    name: req.body.name,
-    password: req.body.password,
-    email: req.body.email,
-  })
-    .then((result) => {
-      // console.log(result);
-
-      res.json({
-        message: "User Registered Successfully",
-        success: true,
-        data: result,
-      });
-    })
-    .catch((err) => {
-      res.json({ message: err.errors[0]["message"], success: false });
+  //     res.json({
+  //       message: "User Registered Successfully",
+  //       success: true,
+  //     });
+  //   });
+  // } catch (err) {
+  //   res.status(500).json(err);
+  // }
+  try {
+    const hashedPwd = await bcrypt.hash(password, 10);
+    const insertResult = await User.create({
+      name: name,
+      password: hashedPwd,
+      email: email,
     });
+    res.json({
+      message: "User Registered Successfully",
+      success: true,
+      data: insertResult,
+    });
+    // res.send(insertResult);
+  } catch (error) {
+    res.status(500).send("Internal Server error Occured");
+  }
 };
 
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
   const password = req.body.password;
   const email = req.body.email;
-  User.findOne({ where: { email: email } })
+  const user = await User.findOne({ where: { email: email } })
     .then((result) => {
-      if (result.password == password) {
-        res.json({
-          message: "User Logged in Successfully",
-          success: true,
-          status: 200,
-          data: result,
-        });
-      } else {
-        res.json({
-          message: "User Not Authorized",
-          status: 401,
-          success: false,
-          // data: [],
-        });
-      }
+      return result;
     })
     .catch((err) => {
       // res.json(err);
@@ -52,4 +53,34 @@ exports.login = (req, res, next) => {
       });
       res.end();
     });
+  try {
+    if (user) {
+      const cmp = await bcrypt.compare(password, user.password);
+      if (cmp) {
+        res.json({
+          message: "User Logged in Successfully",
+          success: true,
+          status: 200,
+          data: user,
+        });
+      } else {
+        res.json({
+          message: "Password is incorrect",
+          message: "User Not Authorized",
+          status: 401,
+          success: false,
+          // data: [],
+        });
+      }
+    } else {
+      res.json({
+        message: "User Not Found",
+        status: 404,
+        success: false,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server error Occured in Login");
+  }
 };
