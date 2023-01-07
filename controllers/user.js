@@ -30,11 +30,13 @@ exports.login = (req, res, next) => {
         res.json({
           message: "User Logged in Successfully",
           success: true,
+          status: 200,
           data: result,
         });
       } else {
         res.json({
-          message: "Password is incorrect",
+          message: "User Not Authorized",
+          status: 401,
           success: false,
           // data: [],
         });
@@ -45,6 +47,7 @@ exports.login = (req, res, next) => {
 
       res.json({
         message: "User Not Found",
+        status: 404,
         success: false,
       });
       res.end();
