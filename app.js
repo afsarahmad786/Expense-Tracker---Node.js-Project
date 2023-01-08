@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const sequelize = require("./util/database");
 const User = require("./models/user");
 const userRoutes = require("./routes2/user");
-console.log(userRoutes);
+const expenseRoutes = require("./routes2/expense");
 
 const app = express();
 app.use(function (req, res, next) {
@@ -24,6 +24,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "js")));
 app.use(userRoutes);
+app.use(expenseRoutes);
 
 sequelize
   // .sync({ force: true })

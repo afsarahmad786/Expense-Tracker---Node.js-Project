@@ -17,6 +17,7 @@ btn.addEventListener("click", function () {
       const suc = response.data["success"];
       if (suc == true) {
         alert(messages + " " + response.data["status"]);
+        location.href = "expense.html";
       } else {
         alert(messages + " " + response.data["status"]);
       }
