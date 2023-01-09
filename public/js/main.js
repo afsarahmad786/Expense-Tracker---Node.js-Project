@@ -2,13 +2,18 @@ document.getElementById("expens").addEventListener("click", function () {
   const amount = document.getElementById("amount").value;
   const description = document.getElementById("description").value;
   const category = document.getElementById("category").value;
-
+  const token = localStorage.getItem("token");
   axios
-    .post("http://127.0.0.1:3000/expense", {
-      amount: amount,
-      description: description,
-      category: category,
-    })
+    .post(
+      "http://127.0.0.1:3000/expense",
+
+      {
+        amount: amount,
+        description: description,
+        category: category,
+      },
+      { headers: { Authorization: token } }
+    )
     .then((response) => {
       const messages = response.data["message"];
       const suc = response.data["success"];
@@ -23,15 +28,20 @@ document.getElementById("expens").addEventListener("click", function () {
       console.log(err);
     });
 });
+
 document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+
   axios
     .get("http://127.0.0.1:3000/expense", {
-      timeout: 5000,
+      headers: { Authorization: token },
     })
     .then((res) => showOutput(res.data))
     .catch((err) => console.error(err));
 });
 function showOutput(res) {
+  console.log(res);
+
   res.data.forEach(additem);
 }
 function additem(item) {

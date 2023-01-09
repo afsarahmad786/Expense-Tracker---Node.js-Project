@@ -5,8 +5,13 @@ const sequelize = require("./util/database");
 const User = require("./models/user");
 const userRoutes = require("./routes2/user");
 const expenseRoutes = require("./routes2/expense");
+const Expense = require("./models/expense");
+var cors = require("cors");
 
 const app = express();
+
+app.use(cors());
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -25,6 +30,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "js")));
 app.use(userRoutes);
 app.use(expenseRoutes);
+
+User.hasMany(Expense);
+Expense.belongsTo(User);
 
 sequelize
   // .sync({ force: true })

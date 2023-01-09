@@ -1,11 +1,11 @@
 const Expense = require("../models/expense");
 exports.add = async (req, res, next) => {
   const { amount, description, category } = req.body;
-
   Expense.create({
     amount: amount,
     description: description,
     category: category,
+    userId: req.user.id,
   })
     .then((result) => {
       res.json({
@@ -20,8 +20,12 @@ exports.add = async (req, res, next) => {
 };
 
 exports.list = async (req, res, next) => {
-  Expense.findAll()
+  console.log(req.user.id);
+
+  Expense.findAll({ where: { userId: req.user.id } })
     .then((response) => {
+      console.log(response);
+
       res.json({ data: response });
     })
     .catch((err) => console.log(err));
