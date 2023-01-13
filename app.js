@@ -5,7 +5,9 @@ const sequelize = require("./util/database");
 const User = require("./models/user");
 const userRoutes = require("./routes2/user");
 const expenseRoutes = require("./routes2/expense");
+const paymentRoutes = require("./routes2/payment");
 const Expense = require("./models/expense");
+const Order = require("./models/order");
 var cors = require("cors");
 
 const app = express();
@@ -30,9 +32,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "js")));
 app.use(userRoutes);
 app.use(expenseRoutes);
+app.use(paymentRoutes);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
+User.hasMany(Order);
+Order.belongsTo(User);
 
 sequelize
   // .sync({ force: true })

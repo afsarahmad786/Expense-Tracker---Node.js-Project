@@ -20,13 +20,27 @@ exports.add = async (req, res, next) => {
 };
 
 exports.list = async (req, res, next) => {
-  console.log(req.user.id);
-
   Expense.findAll({ where: { userId: req.user.id } })
     .then((response) => {
       console.log(response);
-
       res.json({ data: response });
+    })
+    .catch((err) => console.log(err));
+  // console.log(res.json({ data: req.body }));
+};
+
+exports.deleteitem = async (req, res, next) => {
+  console.log(req.params.id);
+
+  Expense.destroy({
+    where: {
+      id: req.params.id,
+    },
+  })
+    .then((response) => {
+      res.status(200).json({ message: "Deleted successfully" });
+
+      // res.json({ data: response });
     })
     .catch((err) => console.log(err));
 

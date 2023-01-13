@@ -9,5 +9,10 @@ const router = express.Router();
 
 router.post("/expense", userAuthenticate.authenticate, expensecontroller.add);
 router.get("/expense", userAuthenticate.authenticate, expensecontroller.list);
+router.delete(
+  "/expense/:id",
+  userAuthenticate.authenticate,
+  expensecontroller.deleteitem
+);
 
 module.exports = router;

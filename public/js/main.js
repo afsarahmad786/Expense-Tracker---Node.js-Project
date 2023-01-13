@@ -40,8 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch((err) => console.error(err));
 });
 function showOutput(res) {
-  console.log(res);
-
   res.data.forEach(additem);
 }
 function additem(item) {
@@ -85,7 +83,8 @@ function additem(item) {
   const button = document.createElement("button");
   button.innerText = "Delete";
   button.className = "btn btn-danger";
-  button.id = itemid;
+  button.id = des + itemid;
+  button.setAttribute("onclick", `del(${des + itemid})`);
 
   sections.appendChild(row);
   div2.append(amount);
@@ -93,3 +92,48 @@ function additem(item) {
   div4.append(category);
   div5.append(button);
 }
+
+function del(item) {
+  const token = localStorage.getItem("token");
+
+  const id = item.id.slice(-1);
+  console.log(id);
+  axios
+    .delete("http://127.0.0.1:3000/expense/" + id, {
+      headers: { Authorization: token },
+    })
+    .then((res) => {
+      const messages = res.data["message"];
+      alert(messages);
+      location.reload();
+    })
+    .catch((err) => console.error(err));
+}
+
+document.getElementById("pay-button").onclick = async function (e) {
+  const token = localStorage.getItem("token");
+  const response = await axios.get("http://127.0.0.1:3000/buypremium", {
+    headers: { Authorization: token },
+  });
+  var options = {
+    key: response.data.key_id,
+    order_id: response.data.order.id,
+    handler: async function (response) {
+      await axios.post(
+        "http://127.0.0.1:3000/updateordertransaction",
+        { orderId: options.order_id, paymentId: response.razoray_payment_id },
+        {
+          headers: { Authorization: token },
+        }
+      );
+      alert("you are premium");
+    },
+  };
+  const rzp1 = new Razorpay(options);
+  rzp1.open();
+  e.preventDefault();
+
+  rzp1.on("payment.failed", function () {
+    alert("something went wrong");
+  });
+};
