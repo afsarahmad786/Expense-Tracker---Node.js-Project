@@ -10,7 +10,7 @@ btn.addEventListener("click", function () {
     })
     .then((response) => {
       console.log(response);
-      alert("forgot");
+      alert(response.data.message + " to " + response.data.emailId);
     })
     .catch((err) => {
       console.log(err);

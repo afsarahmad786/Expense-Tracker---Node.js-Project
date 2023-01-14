@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sgMail = require("@sendgrid/mail");
 
 function generateAccessToken(id, name) {
   return jwt.sign(
@@ -95,5 +96,23 @@ exports.login = async (req, res, next) => {
   }
 };
 exports.restorepass = async (req, res, next) => {
-  res.send("Forgot Pass");
+  sgMail.setApiKey("sendgridApiKey");
+  const msg = {
+    to: req.body.email,
+    from: {
+      email: "mohammadafsar415@gmail.com",
+      name: "Afsar Ahmad",
+    },
+    subject: "Hello from SendGrid",
+    text: "Hello from SendGrid",
+    html: "<h2>Hello from SendGrid</h2>",
+  };
+  sgMail
+    .send(msg)
+    .then(() => {
+      res.json({ message: "Email Sent", emailId: req.body.email });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
