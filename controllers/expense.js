@@ -51,8 +51,13 @@ exports.deleteitem = async (req, res, next) => {
 
 exports.leaderboards = async (req, res, next) => {
   Expense.findAll({
-    include: User,
-
+    // include: User,
+    include: [
+      {
+        attributes: ["name"],
+        model: User,
+      },
+    ],
     // Will order by max(age)
     attributes: [
       "userId",

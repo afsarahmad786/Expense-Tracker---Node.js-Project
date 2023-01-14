@@ -94,3 +94,6 @@ exports.login = async (req, res, next) => {
     res.status(500).send("Internal Server error Occured in Login");
   }
 };
+exports.restorepass = async (req, res, next) => {
+  res.send("Forgot Pass");
+};
