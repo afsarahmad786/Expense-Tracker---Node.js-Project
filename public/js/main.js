@@ -43,6 +43,13 @@ function showOutput(res) {
   res.data.forEach(additem);
 }
 function additem(item) {
+  console.log(item);
+  if (item.user.ispremium) {
+    document.getElementById("premium-feature").innerHTML = " premium user ";
+    document.getElementById("premium-feature").style.fontSize = "25px";
+    document.getElementById("pay-button").style.visibility = "hidden";
+  }
+
   const itemid = item.id;
   const amnt = item.amount;
   const cat = item.category;
@@ -126,7 +133,12 @@ document.getElementById("pay-button").onclick = async function (e) {
           headers: { Authorization: token },
         }
       );
+      // document.getElementById("pay-button").style.visibility = "hidden";
+      // document.getElementById("premium-feature").innerHTML =
+      //   "You're Premium user now";
+      // document.getElementById("premium-feature").style.fontSize = "200px";
       alert("you are premium");
+      location.reload();
     },
   };
   const rzp1 = new Razorpay(options);
@@ -137,3 +149,32 @@ document.getElementById("pay-button").onclick = async function (e) {
     alert("something went wrong");
   });
 };
+
+document.getElementById("leaderboard").onclick = async function (e) {
+  const token = localStorage.getItem("token");
+
+  axios
+    .get("http://127.0.0.1:3000/leaderboard", {
+      headers: { Authorization: token },
+    })
+    .then(
+      (res) => showLeaderboard(res.data)
+      // console.log(res)
+    )
+    .catch((err) => console.error(err));
+};
+function showLeaderboard(res) {
+  document.getElementById("li-header").innerHTML = "LeaderBoard";
+  res.data.forEach(addboard);
+}
+
+function addboard(item) {
+  console.log(item);
+  const ul = document.getElementById("board-item");
+
+  const di = document.createElement("li");
+  di.innerText =
+    "Name : " + item.user.name + " Total Expense: " + item.total_amount;
+
+  ul.append(di);
+}

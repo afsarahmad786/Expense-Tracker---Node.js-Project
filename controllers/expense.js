@@ -1,4 +1,6 @@
 const Expense = require("../models/expense");
+const User = require("../models/user");
+const sequelize = require("sequelize");
 exports.add = async (req, res, next) => {
   const { amount, description, category } = req.body;
   Expense.create({
@@ -20,7 +22,7 @@ exports.add = async (req, res, next) => {
 };
 
 exports.list = async (req, res, next) => {
-  Expense.findAll({ where: { userId: req.user.id } })
+  Expense.findAll({ where: { userId: req.user.id }, include: User })
     .then((response) => {
       console.log(response);
       res.json({ data: response });
@@ -46,3 +48,26 @@ exports.deleteitem = async (req, res, next) => {
 
   // console.log(res.json({ data: req.body }));
 };
+
+exports.leaderboards = async (req, res, next) => {
+  Expense.findAll({
+    include: User,
+    // order: [
+    //   ["amount", "DESC"],
+    //   // ["userId", "DESC"],
+    // ],
+    // Will order by max(age)
+    attributes: [
+      "userId",
+      [sequelize.fn("SUM", sequelize.col("amount")), "total_amount"],
+    ],
+    group: ["userId"],
+  })
+    .then((response) => {
+      console.log(response);
+      res.json({ data: response });
+    })
+    .catch((err) => console.log(err));
+};
+
+// exports.leaderboards

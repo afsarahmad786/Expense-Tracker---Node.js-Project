@@ -15,4 +15,10 @@ router.delete(
   expensecontroller.deleteitem
 );
 
+router.get(
+  "/leaderboard",
+  userAuthenticate.authenticate,
+  expensecontroller.leaderboards
+);
+
 module.exports = router;

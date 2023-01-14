@@ -1,10 +1,11 @@
 const Order = require("../models/order");
+const User = require("../models/user");
 const Razorpay = require("razorpay");
 
 exports.updateTransaction = async (req, res, next) => {
   const { orderId, paymentId } = req.body;
 
-  Order.findOne({ where: { orderId: orderId } })
+  Order.findOne({ include: User }, { where: { orderId: orderId } })
     .then((order) => {
       order
         .update({ paymentId: paymentId, status: "SUCCESSFULL" })
