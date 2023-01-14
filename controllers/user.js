@@ -1,8 +1,11 @@
 const User = require("../models/user");
+const Forgot = require("../models/forgot");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
-
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const newId = uuidv4();
 function generateAccessToken(id, name) {
   return jwt.sign(
     { userId: id, name: name },
@@ -96,7 +99,9 @@ exports.login = async (req, res, next) => {
   }
 };
 exports.restorepass = async (req, res, next) => {
-  sgMail.setApiKey("sendgridApiKey");
+  sgMail.setApiKey(
+    "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"
+  );
   const msg = {
     to: req.body.email,
     from: {
@@ -107,12 +112,80 @@ exports.restorepass = async (req, res, next) => {
     text: "Hello from SendGrid",
     html: "<h2>Hello from SendGrid</h2>",
   };
+  const user = await User.findOne({ where: { email: req.body.email } })
+    .then((result) => {
+      return result;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  const forg = await Forgot.create({
+    uuid: newId,
+    isactive: true,
+    userId: user.id,
+  })
+    .then((resss) => {
+      return resss;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  console.log(forg);
   sgMail
     .send(msg)
     .then(() => {
-      res.json({ message: "Email Sent", emailId: req.body.email });
+      res.json({
+        message: "Email Sent",
+        emailId: req.body.email,
+        link: "127.0.0.1:3000/password/forgotpassword/" + forg.uuid,
+      });
     })
     .catch((error) => {
       console.log(error);
     });
+};
+
+exports.resetpass = async (req, res, next) => {
+  const uuid = req.params.uuid;
+  const checklink = await Forgot.findOne({ where: { uuid: uuid } })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  if (checklink.isactive == true) {
+    res.sendFile("reset.html", { root: path.join(__dirname, "../views") });
+    // res.sendFile(
+    //   path.join(path.dirname(process.mainModule.filename), "/views/reset.html")
+    // );
+    // res.sendFile("reset.html");
+  } else {
+    res.send("Not Allowed");
+  }
+};
+
+exports.changepass = async (req, res, next) => {
+  const checklink = await Forgot.findOne({ where: { uuid: req.params.uuid } })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  const hashedPwd = await bcrypt.hash(req.body.password, 10);
+
+  if (checklink.isactive == true) {
+    Forgot.update({ isactive: false }, { where: { uuid: req.params.uuid } });
+    User.update({ password: hashedPwd }, { where: { id: checklink.userId } })
+      .then(() => {
+        res.json({
+          message: "Password Changed Successfully",
+          status: 200,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 };

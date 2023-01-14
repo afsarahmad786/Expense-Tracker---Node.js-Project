@@ -8,6 +8,7 @@ const expenseRoutes = require("./routes2/expense");
 const paymentRoutes = require("./routes2/payment");
 const Expense = require("./models/expense");
 const Order = require("./models/order");
+const Forgot = require("./models/forgot");
 var cors = require("cors");
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "js")));
+// app.use(express.static(path.join(__dirname, "views")));
 app.use(userRoutes);
 app.use(expenseRoutes);
 app.use(paymentRoutes);
@@ -39,6 +41,9 @@ Expense.belongsTo(User);
 
 User.hasMany(Order);
 Order.belongsTo(User);
+
+User.hasMany(Forgot);
+Forgot.belongsTo(User);
 
 sequelize
   // .sync({ force: true })
