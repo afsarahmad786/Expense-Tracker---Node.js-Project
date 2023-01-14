@@ -52,16 +52,17 @@ exports.deleteitem = async (req, res, next) => {
 exports.leaderboards = async (req, res, next) => {
   Expense.findAll({
     include: User,
-    // order: [
-    //   ["amount", "DESC"],
-    //   // ["userId", "DESC"],
-    // ],
+
     // Will order by max(age)
     attributes: [
       "userId",
       [sequelize.fn("SUM", sequelize.col("amount")), "total_amount"],
     ],
     group: ["userId"],
+    order: [
+      ["total_amount", "DESC"],
+      // ["userId", "DESC"],
+    ],
   })
     .then((response) => {
       console.log(response);

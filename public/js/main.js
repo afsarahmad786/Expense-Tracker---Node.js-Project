@@ -43,11 +43,12 @@ function showOutput(res) {
   res.data.forEach(additem);
 }
 function additem(item) {
-  console.log(item);
+  // console.log(item);
   if (item.user.ispremium) {
     document.getElementById("premium-feature").innerHTML = " premium user ";
     document.getElementById("premium-feature").style.fontSize = "25px";
     document.getElementById("pay-button").style.visibility = "hidden";
+    document.getElementById("leaderboard").style.visibility = "visible";
   }
 
   const itemid = item.id;
@@ -169,7 +170,7 @@ function showLeaderboard(res) {
 }
 
 function addboard(item) {
-  console.log(item);
+  // console.log(item);
   const ul = document.getElementById("board-item");
 
   const di = document.createElement("li");
