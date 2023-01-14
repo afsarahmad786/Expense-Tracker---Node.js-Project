@@ -21,4 +21,6 @@ router.get(
   expensecontroller.leaderboards
 );
 
+router.get("/report", userAuthenticate.authenticate, expensecontroller.reports);
+
 module.exports = router;

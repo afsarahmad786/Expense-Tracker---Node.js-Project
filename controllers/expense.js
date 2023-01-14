@@ -77,3 +77,30 @@ exports.leaderboards = async (req, res, next) => {
 };
 
 // exports.leaderboards
+
+exports.reports = async (req, res, next) => {
+  Expense.findAll({
+    // include: User,
+    include: [
+      {
+        attributes: ["name"],
+        model: User,
+      },
+    ],
+    // Will order by max(age)
+    attributes: [
+      "userId",
+      [sequelize.fn("SUM", sequelize.col("amount")), "total_amount"],
+    ],
+    group: ["userId"],
+    order: [
+      ["total_amount", "DESC"],
+      // ["userId", "DESC"],
+    ],
+  })
+    .then((response) => {
+      console.log(response);
+      res.json({ data: response });
+    })
+    .catch((err) => console.log(err));
+};
