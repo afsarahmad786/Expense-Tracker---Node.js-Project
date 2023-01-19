@@ -7,6 +7,7 @@ const userRoutes = require("./routes2/user");
 const expenseRoutes = require("./routes2/expense");
 const paymentRoutes = require("./routes2/payment");
 const Expense = require("./models/expense");
+const Report = require("./models/report");
 const Order = require("./models/order");
 const Forgot = require("./models/forgot");
 var cors = require("cors");
@@ -44,6 +45,9 @@ Order.belongsTo(User);
 
 User.hasMany(Forgot);
 Forgot.belongsTo(User);
+
+User.hasMany(Report);
+Report.belongsTo(User);
 
 sequelize
   // .sync({ force: true })

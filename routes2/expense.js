@@ -2,7 +2,6 @@ const path = require("path");
 
 const express = require("express");
 const userAuthenticate = require("../middleware/auth");
-
 const expensecontroller = require("../controllers/expense");
 
 const router = express.Router();
@@ -22,5 +21,16 @@ router.get(
 );
 
 router.get("/report", userAuthenticate.authenticate, expensecontroller.reports);
+router.get(
+  "/downloadreport",
+  userAuthenticate.authenticate,
+  expensecontroller.downloadExpense
+);
+
+router.get(
+  "/seereport",
+  userAuthenticate.authenticate,
+  expensecontroller.SeeReports
+);
 
 module.exports = router;

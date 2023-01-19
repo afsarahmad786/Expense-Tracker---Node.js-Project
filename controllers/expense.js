@@ -1,6 +1,11 @@
 const Expense = require("../models/expense");
+const Report = require("../models/report");
 const User = require("../models/user");
 const sequelize = require("sequelize");
+const fs = require("fs");
+const UserServices = require("../services/userservices");
+const S3Services = require("../services/S3services");
+// import { Op } from "sequelize";
 exports.add = async (req, res, next) => {
   const { amount, description, category } = req.body;
   Expense.create({
@@ -52,6 +57,7 @@ exports.deleteitem = async (req, res, next) => {
 exports.leaderboards = async (req, res, next) => {
   Expense.findAll({
     // include: User,
+
     include: [
       {
         attributes: ["name"],
@@ -79,28 +85,92 @@ exports.leaderboards = async (req, res, next) => {
 // exports.leaderboards
 
 exports.reports = async (req, res, next) => {
-  Expense.findAll({
-    // include: User,
-    include: [
-      {
-        attributes: ["name"],
-        model: User,
-      },
-    ],
-    // Will order by max(age)
-    attributes: [
-      "userId",
-      [sequelize.fn("SUM", sequelize.col("amount")), "total_amount"],
-    ],
-    group: ["userId"],
-    order: [
-      ["total_amount", "DESC"],
-      // ["userId", "DESC"],
-    ],
-  })
+  const total = await Expense.findAll(
+    {
+      attributes: [
+        [sequelize.fn("SUM", sequelize.col("amount")), "total_amount"],
+      ],
+    },
+    { where: { userId: req.user.id } }
+  )
     .then((response) => {
-      console.log(response);
-      res.json({ data: response });
+      return response;
     })
     .catch((err) => console.log(err));
+
+  const dat = await Expense.findAll(
+    {
+      where: {
+        [sequelize.Op.and]: [
+          sequelize.where(
+            sequelize.fn("MONTH", sequelize.col("createdAt")),
+            "01"
+          ),
+          sequelize.where(
+            sequelize.fn("YEAR", sequelize.col("updatedAt")),
+            "2023"
+          ),
+        ],
+      },
+    },
+    { where: { userId: req.user.id } }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => console.log(err));
+  console.log("ddddddddd", dat);
+  Expense.findAll({}, { where: { userId: req.user.id } })
+    .then((response2) => {
+      obj = {
+        ...response2,
+        ...{ total_amount: total[0].dataValues.total_amount },
+      };
+      // response2.push({ total_amount: total[0].dataValues.total_amount });
+      res.json({ data: obj });
+    })
+    .catch((err) => console.log(err));
+
+  // const exp = await Expense.findAll({ where: { userId: req.user.id } })
+  //   .then((response2) => {
+  //     return response2;
+  //   })
+  //   .catch((err) => console.log(err));
+
+  // result.push(exp);
+  // res.json({ message: "Expense Fetched Successfully", data: result });
+};
+
+exports.downloadExpense = async (req, res, next) => {
+  try {
+    const expenses = await req.user.getExpenses();
+
+    const stringi = JSON.stringify(expenses);
+    const userId = req.user.id;
+
+    const filenames = `Expense${userId}/${new Date()}.txt`;
+    const fileUrl = await S3Services.uploadToS3(stringi, filenames);
+    req.user
+      .createReport({ link: fileUrl })
+      .then(() => {
+        console.log("success");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    res.status(200).json({ fileUrl, success: true, status: 200 });
+  } catch (err) {
+    throw new Error(JSON.stringify(err));
+  }
+};
+
+exports.SeeReports = async (req, res, next) => {
+  try {
+    const reports = await req.user.getReports();
+
+    res.status(200).json({ reports, success: true, status: 200 });
+  } catch (err) {
+    throw new Error(JSON.stringify(err));
+  }
 };

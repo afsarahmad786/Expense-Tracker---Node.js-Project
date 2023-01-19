@@ -49,6 +49,8 @@ function additem(item) {
     document.getElementById("premium-feature").style.fontSize = "25px";
     document.getElementById("pay-button").style.visibility = "hidden";
     document.getElementById("leaderboard").style.visibility = "visible";
+    document.getElementById("reportdownload").style.visibility = "visible";
+    document.getElementById("leaderboard").style.visibility = "visible";
   }
 
   const itemid = item.id;
@@ -176,6 +178,60 @@ function addboard(item) {
   const di = document.createElement("li");
   di.innerText =
     "Name : " + item.user.name + " Total Expense: " + item.total_amount;
+
+  ul.append(di);
+}
+
+document
+  .getElementById("reportdownload")
+  .addEventListener("click", function () {
+    const token = localStorage.getItem("token");
+
+    axios
+      .get("http://127.0.0.1:3000/downloadreport", {
+        headers: { Authorization: token },
+      })
+      .then((res) => {
+        if (res.data.status === 200) {
+          var a = document.createElement("a");
+          a.href = res.data.fileUrl;
+          a.download = "myexpense.csv";
+          a.click();
+          alert("file_downloaded");
+        }
+      })
+      .catch((err) => console.error(err));
+  });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+
+  axios
+    .get(
+      "http://127.0.0.1:3000/seereport",
+
+      { headers: { Authorization: token } }
+    )
+    .then((response) => {
+      const data = response.data;
+      data.reports.forEach(addreport);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+function addreport(item) {
+  const ul = document.getElementById("board-item");
+
+  const di = document.createElement("li");
+  const btn = document.createElement("a");
+  btn.href = item.link;
+
+  btn.innerText = "downloaded on - " + item.createdAt;
+
+  di.append(btn);
+  // di.innerText = "Downloaded file created on : " + item.createdAt;
 
   ul.append(di);
 }
