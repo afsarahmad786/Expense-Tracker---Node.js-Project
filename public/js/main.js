@@ -40,7 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch((err) => console.error(err));
 });
 function showOutput(res) {
-  res.data.forEach(additem);
+  console.log(res);
+  res.data.rows.forEach(additem);
 }
 function additem(item) {
   // console.log(item);
@@ -235,3 +236,32 @@ function addreport(item) {
 
   ul.append(di);
 }
+
+document.getElementById("paginat").addEventListener("click", function () {
+  alert("yuppppp");
+});
+
+document.getElementById("page1").addEventListener("click", () => {
+  const token = localStorage.getItem("token");
+  let page = window.location.href.split("?")[1];
+  // let limit = window.location.href.split("?")[2];
+
+  axios
+    .get("http://127.0.0.1:3000/expense?" + page, {
+      headers: { Authorization: token },
+    })
+    .then((res) => console.log(res))
+    .catch((err) => console.error(err));
+});
+document.getElementById("page2").addEventListener("click", () => {
+  const token = localStorage.getItem("token");
+  let page = window.location.href + "?page=1";
+  // let limit = window.location.href.split("?")[2];
+
+  axios
+    .get("http://127.0.0.1:3000/expense?" + page + "=1", {
+      headers: { Authorization: token },
+    })
+    .then((res) => console.log(res))
+    .catch((err) => console.error(err));
+});
