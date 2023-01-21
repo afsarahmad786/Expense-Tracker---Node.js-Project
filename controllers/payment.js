@@ -32,8 +32,8 @@ exports.updateTransaction = async (req, res, next) => {
 
 exports.buypremimusss = async (req, res, next) => {
   var rzp = new Razorpay({
-    key_id: "rzp_test_U7wkfKc0defrB0",
-    key_secret: "kvB1AhG2yKMjkG2u2XiydDjS",
+    key_id: process.env.API_KEY,
+    key_secret: process.env.API_SECRET,
   });
   const amount = 100;
   rzp.orders.create({ amount, currency: "INR" }, (err, order) => {

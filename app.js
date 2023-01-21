@@ -10,9 +10,20 @@ const Expense = require("./models/expense");
 const Report = require("./models/report");
 const Order = require("./models/order");
 const Forgot = require("./models/forgot");
+const fs = require("fs");
+
 var cors = require("cors");
 
+const helmet = require("helmet");
+const morgan = require("morgan");
+
 const app = express();
+
+const accessLogStram = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+
+  { flags: "a" }
+);
 
 app.use(cors());
 
@@ -36,6 +47,8 @@ app.use(express.static(path.join(__dirname, "js")));
 app.use(userRoutes);
 app.use(expenseRoutes);
 app.use(paymentRoutes);
+app.use(helmet());
+app.use(morgan("combined", { stream: accessLogStram }));
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
@@ -54,7 +67,7 @@ sequelize
   .sync()
   .then((result) => {
     console.log(result);
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
   })
 
   // console.log(user);

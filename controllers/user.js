@@ -7,10 +7,7 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const newId = uuidv4();
 function generateAccessToken(id, name) {
-  return jwt.sign(
-    { userId: id, name: name },
-    "987546585454566985abavchafjagjaaj"
-  );
+  return jwt.sign({ userId: id, name: name }, process.env.JWT_SECT);
 }
 
 exports.register = async (req, res, next) => {
@@ -99,9 +96,7 @@ exports.login = async (req, res, next) => {
   }
 };
 exports.restorepass = async (req, res, next) => {
-  sgMail.setApiKey(
-    "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"
-  );
+  sgMail.setApiKey(process.env.SGRID_API);
   const msg = {
     to: req.body.email,
     from: {

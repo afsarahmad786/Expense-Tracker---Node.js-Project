@@ -39,6 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let page = localStorage.getItem("page");
 
   let limit = localStorage.getItem("limit");
+  if (!limit) {
+    limit = 0;
+  }
 
   console.log(limit);
   if (!page) {
@@ -65,7 +68,7 @@ function showOutput(res) {
 
   const sections = document.getElementById("sections");
   const h1 = document.createElement("h1");
-  h1.innerText = "Showing 10 of " + totalItem;
+  h1.innerText = `Showing ${currentPage * 10} of ` + totalItem;
 
   sections.appendChild(h1);
   // let pagesection = document.getElementById("paginat");
