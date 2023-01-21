@@ -32,15 +32,21 @@ const getPagination = (page, size) => {
   return { limit, offset };
 };
 const getPagingData = (data, page, limit) => {
-  const { count: totalItems, rows: tutorials } = data;
+  const { count: totalItems, rows: res } = data;
   const currentPage = page ? +page : 0;
   const totalPages = Math.ceil(totalItems / limit);
 
-  return { totalItems, tutorials, totalPages, currentPage };
+  return { totalItems, res, totalPages, currentPage };
 };
 
 exports.list = async (req, res, next) => {
-  const { page, size, title } = req.query;
+  let q = req.query;
+  let p = q.page.split("?")[0];
+  let l = q.page.split("=")[1];
+  console.log("ppppppppppppppp", p, l);
+  // const { page, size, title } = req.query;
+  const page = p;
+  const size = l;
   const { limit, offset } = getPagination(page, size);
 
   Expense.findAndCountAll({
@@ -51,8 +57,9 @@ exports.list = async (req, res, next) => {
   })
 
     .then((response) => {
-      console.log(response);
-      res.json({ data: response });
+      const data = getPagingData(response, page, limit);
+      console.log(data);
+      res.json({ data: data });
     })
     .catch((err) => console.log(err));
   // console.log(res.json({ data: req.body }));

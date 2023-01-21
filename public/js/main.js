@@ -28,21 +28,106 @@ document.getElementById("expens").addEventListener("click", function () {
       console.log(err);
     });
 });
+document.getElementById("setlimit").addEventListener("click", function () {
+  let limit = document.getElementById("select1").value;
+  localStorage.setItem("limit", limit);
+  location.reload();
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
+  let page = localStorage.getItem("page");
+
+  let limit = localStorage.getItem("limit");
+
+  console.log(limit);
+  if (!page) {
+    page = 0;
+  }
 
   axios
-    .get("http://127.0.0.1:3000/expense", {
+    .get("http://127.0.0.1:3000/expense?page=" + page + "?limit=" + limit, {
       headers: { Authorization: token },
     })
     .then((res) => showOutput(res.data))
     .catch((err) => console.error(err));
 });
-function showOutput(res) {
-  console.log(res);
-  res.data.rows.forEach(additem);
+function pagen(i) {
+  return i + 1;
 }
+function showOutput(res) {
+  const totalItem = res.data.totalItems;
+  const totalPage = res.data.totalPages;
+  const currentPage = res.data.currentPage;
+  console.log(totalItem, totalPage, currentPage);
+
+  let pagesection = document.getElementById("paginat");
+
+  const sections = document.getElementById("sections");
+  const h1 = document.createElement("h1");
+  h1.innerText = "Showing 10 of " + totalItem;
+
+  sections.appendChild(h1);
+  // let pagesection = document.getElementById("paginat");
+  const button = document.createElement("button");
+  button.innerText = "Previous";
+  button.className = "btn btn-primary";
+  button.setAttribute("onclick", `paginatepage(${currentPage - 1})`);
+  pagesection.append(button);
+
+  for (let i = 0; i < totalPage; i++) {
+    const button = document.createElement("button");
+    button.innerText = pagen(i);
+    button.className = "btn btn-primary";
+    let id = pagen(i);
+    button.setAttribute("onclick", `paginatepage(${id - 1})`);
+    pagesection.append(button);
+  }
+
+  const button1 = document.createElement("button");
+  button1.innerText = "last";
+  button1.className = "btn btn-primary";
+  button1.setAttribute("onclick", `paginatepage(${totalPage - 1})`);
+  pagesection.append(button1);
+
+  res.data.res.forEach(additem);
+}
+function domcontent(page = 0) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+
+    axios
+      .get("http://127.0.0.1:3000/expense?page=" + page, {
+        headers: { Authorization: token },
+      })
+      .then((res) => showOutput(res.data))
+      .catch((err) => console.error(err));
+  });
+}
+
+function paginatepage(page) {
+  localStorage.setItem("page", page);
+  location.reload();
+
+  // console.log(page);
+  // $(window).unload();
+  // e.preventDefault();
+  // const token = localStorage.getItem("token");
+  // domcontent(page);
+  // location.reload();
+
+  // axios
+  //   .get("http://127.0.0.1:3000/expense?page=" + page, {
+  //     headers: { Authorization: token },
+  //   })
+  //   .then((res) =>
+  //     //  console.log(res.data)
+  //     showOutput(res.data)
+  //   )
+  //   .catch((err) => console.error(err));
+  // location.reload();
+}
+
 function additem(item) {
   // console.log(item);
   if (item.user.ispremium) {
@@ -237,31 +322,27 @@ function addreport(item) {
   ul.append(di);
 }
 
-document.getElementById("paginat").addEventListener("click", function () {
-  alert("yuppppp");
-});
+// document.getElementById("page1").addEventListener("click", () => {
+//   const token = localStorage.getItem("token");
+//   let page = window.location.href.split("?")[1];
+//   // let limit = window.location.href.split("?")[2];
 
-document.getElementById("page1").addEventListener("click", () => {
-  const token = localStorage.getItem("token");
-  let page = window.location.href.split("?")[1];
-  // let limit = window.location.href.split("?")[2];
+//   axios
+//     .get("http://127.0.0.1:3000/expense?" + page, {
+//       headers: { Authorization: token },
+//     })
+//     .then((res) => console.log(res))
+//     .catch((err) => console.error(err));
+// });
+// document.getElementById("page2").addEventListener("click", () => {
+//   const token = localStorage.getItem("token");
+//   let page = window.location.href + "?page=1";
+//   // let limit = window.location.href.split("?")[2];
 
-  axios
-    .get("http://127.0.0.1:3000/expense?" + page, {
-      headers: { Authorization: token },
-    })
-    .then((res) => console.log(res))
-    .catch((err) => console.error(err));
-});
-document.getElementById("page2").addEventListener("click", () => {
-  const token = localStorage.getItem("token");
-  let page = window.location.href + "?page=1";
-  // let limit = window.location.href.split("?")[2];
-
-  axios
-    .get("http://127.0.0.1:3000/expense?" + page + "=1", {
-      headers: { Authorization: token },
-    })
-    .then((res) => console.log(res))
-    .catch((err) => console.error(err));
-});
+//   axios
+//     .get("http://127.0.0.1:3000/expense?" + page + "=1", {
+//       headers: { Authorization: token },
+//     })
+//     .then((res) => console.log(res))
+//     .catch((err) => console.error(err));
+// });
