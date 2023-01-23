@@ -11,13 +11,16 @@ const Report = require("./models/report");
 const Order = require("./models/order");
 const Forgot = require("./models/forgot");
 const fs = require("fs");
-
+const https = require("https");
 var cors = require("cors");
 
 const helmet = require("helmet");
 const morgan = require("morgan");
 
 const app = express();
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const accessLogStram = fs.createWriteStream(
   path.join(__dirname, "access.log"),
@@ -39,6 +42,10 @@ app.use(function (req, res, next) {
   );
   next();
 });
+
+const privateKey = fs.readFileSync("server.key");
+const certificateKey = fs.readFileSync("server.cert");
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
@@ -67,6 +74,9 @@ sequelize
   .sync()
   .then((result) => {
     console.log(result);
+    // https
+    //   .createServer({ key: privateKey, cert: certificateKey }, app)
+    //   .listen(process.env.PORT || 3000);
     app.listen(process.env.PORT || 3000);
   })
 
