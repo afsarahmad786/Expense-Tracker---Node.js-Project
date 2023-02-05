@@ -132,7 +132,7 @@ exports.restorepass = async (req, res, next) => {
       res.json({
         message: "Email Sent",
         emailId: req.body.email,
-        link: "127.0.0.1:3000/password/forgotpassword/" + forg.uuid,
+        link: "43.207.26.174:3000/password/forgotpassword/" + forg.uuid,
       });
     })
     .catch((error) => {
